@@ -3,6 +3,7 @@ import Text.Parsec.String
 import Text.Parsec.Prim as Prim hiding(State)
 import Control.Monad.State
 import Control.Arrow hiding(loop)
+import Control.Applicative hiding((<|>),many)
 import Data.Word
 import Data.Char
 
@@ -75,8 +76,36 @@ whiteWorld = (([0],[]),"")
 eval :: [BF] -> String
 eval code = reverse $ snd $ execState (evalBFCode code) whiteWorld
 
+unrollImpHelper :: BF -> State World [BF]
+unrollImpHelper b = nextWorld b >> return [b]
+
+unrollImp :: BF -> State World [BF]
+unrollImp l@(Loop bs) = do
+  (((flg:_),_),_) <- get
+  if (flg == 0)
+  then return []
+  else (++) <$> (unrollBFCode bs) <*> (unrollImp l)
+
+unrollImp b = unrollImpHelper b
+
+unrollBFCode :: [BF] -> State World [BF]
+unrollBFCode = fmap concat . sequence . map unrollImp 
+
+unroll :: [BF] -> [BF]
+unroll code = evalState (unrollBFCode code) whiteWorld
+
 runBF :: String -> String
 runBF = eval . makeTree
 
 main :: IO ()
-main = getContents >>= return . runBF >>= putStrLn
+main = getContents >>= return . show . unroll . makeTree >>= putStrLn
+
+
+
+
+
+
+
+
+
+
