@@ -6,7 +6,7 @@ import Control.Arrow hiding(loop)
 import Data.Word
 import Data.Char
 
-data BF = Inc | Dec | Lt | Gt | OUT | Loop [BF] deriving (Eq, Show, Read)
+data BF = Inc | Dec | Lt | Gt | Out | Loop [BF] deriving (Eq, Show, Read)
 
 bf :: Parser BF
 bf = Prim.try inc <|> Prim.try dec <|> Prim.try lt <|> Prim.try gt <|> Prim.try out <|> Prim.try loop 
@@ -24,7 +24,7 @@ gt :: Parser BF
 gt = char '>' >> return Gt
 
 out :: Parser BF
-out = char '.' >> return OUT
+out = char '.' >> return Out
 
 loop :: Parser BF
 loop = do
@@ -61,7 +61,7 @@ nextWorld Gt = modify $ first f
   where
     f (xs,[]) = (0:xs,[])
     f (xs, (y:ys)) = (y:xs, ys)
-nextWorld OUT = modify $ \(mem,os) -> let o = chr $ fromIntegral $ head $ fst mem in (mem,o:os)
+nextWorld Out = modify $ \(mem,os) -> let o = chr $ fromIntegral $ head $ fst mem in (mem,o:os)
 nextWorld l@(Loop bs) = do
   (((flg:_),_),_) <- get
   when (flg /= 0) $ (evalBFCode bs >> nextWorld l)
