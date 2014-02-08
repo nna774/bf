@@ -112,21 +112,5 @@ bfShow :: [BF] -> String
 bfShow = concat . map show
 
 main :: IO ()
-main = getContents >>= return . bfShow . optAnnihilation . unroll . makeTree  >>= putStrLn
--- main = getContents >>= return . runBF  >>= putStrLn
--- main = getContents >>= return . bfShow . unroll . makeTree  >>= putStrLn
+main = getContents >>= return . runBF  >>= putStrLn
 
-optAnnihilation :: [BF] -> [BF]
-optAnnihilation code = if f code == code then code else optAnnihilation (f code)
-    where
-      f [] = []
-      f (Inc:Dec:xs) = f xs
-      f (Dec:Inc:xs) = f xs
-      f (b:Inc:xs) = b : f (Inc:xs)
-      f (b:Dec:xs) = b : f (Dec:xs)
-      f (Lt:Gt:xs) = f xs
-      f (Gt:Lt:xs) = f xs
-      f (b:Lt:xs) = b : f (Lt:xs)
-      f (b:Gt:xs) = b : f (Gt:xs)
-      f (Out:xs) = Out :f xs
-      f (x:Out:xs) = x : Out :f xs
