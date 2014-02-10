@@ -64,7 +64,7 @@ nextWorld Inc = biC (+1)
 nextWorld Dec = biC (subtract 1)
 nextWorld Lt = modify $ first f
   where
-    f ([],_) = error "too many <"
+    f ([],_) = error "too many < (negative PC)"
     f ((x:xs), ys) = (xs, x:ys)
 nextWorld Gt = modify $ first f
   where
